@@ -26,7 +26,7 @@ module.exports = {
       code: Joi.any().valid(200).required(),
       channels: Joi.array().items(Joi.string()).required()
     },
-    incorrectPermissions: {
+    incorrectPermissionsError: {
       sequence: Joi.number().integer().required(),
       code: Joi.any().valid(401).required(),
       message: Joi.any().valid('Not Authorized').required(),
@@ -46,12 +46,20 @@ module.exports = {
       code: Joi.any().valid(200).required(),
       channels: Joi.array().items(Joi.string()).required()
     },
-    incorrectPermissions: {
+    incorrectPermissionsError: {
       sequence: Joi.number().integer().required(),
       code: Joi.any().valid(401).required(),
       message: Joi.any().valid('Not Authorized').required(),
       details: Joi.string().valid(
         "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels."
+      ).required()
+    },
+    notFoundError: {
+      sequence: Joi.number().integer().required(),
+      code: Joi.any().valid(404).required(),
+      message: Joi.any().valid("Not Found").required(),
+      details: Joi.any().valid(
+        "You are not subscribed to the specified channel."
       ).required()
     }
   },
@@ -62,7 +70,7 @@ module.exports = {
       channel: Joi.string().required(),
       message: Joi.string().required()
     },
-    incorrectPermissions: {
+    incorrectPermissionsError: {
       sequence: Joi.number().integer().required(),
       code: Joi.any().valid(401).required(),
       message: Joi.any().valid('Not Authorized').required(),
@@ -70,13 +78,26 @@ module.exports = {
         "You do not have write permissions on this socket, and therefore cannot publish to channels."
       ).required()
     },
-    noSubscriptions: {
+    noSubscriptionsError: {
       sequence: Joi.number().integer().required(),
       code: Joi.any().valid(404).required(),
       message: Joi.any().valid('Not Found').required(),
       details: Joi.any().valid(
         "There are no subscribers to the specified channel, so the message could not be delivered."
       ).required()
+    }
+  },
+  message: {
+    id: Joi.string().guid().required(),
+    recieved: Joi.date().iso().required(),
+    channel: Joi.string().required(),
+    message: Joi.string().required()
+  },
+  validate: function(object, validator, callback) {
+    if(typeof callback === 'function') {
+      return Joi.validate(object, validator, callback);
+    } else {
+      return Joi.validate(object, validator);
     }
   }
 };

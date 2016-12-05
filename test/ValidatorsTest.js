@@ -1,4 +1,4 @@
-/* jshint: expr: true */
+/*jshint: expr: true*/
 const Joi = require('joi');
 const validators = require('../index');
 const expect = require('chai').expect;
@@ -13,7 +13,7 @@ function changeValue(object, value, validator) {
 
 function tryMultipleInvalidValues(valid, invalidObjects, validator) {
   _.each(invalidObjects, function(invalidObject) {
-    it(`should fail when ${Object.keys(invalidObject)[0]} is not ${invalidObject[Object.keys(invalidObject)[0]]}`, function() {
+    it(`should fail when ${Object.keys(invalidObject)[0]} is '${invalidObject[Object.keys(invalidObject)[0]]}'`, function() {
       changeValue(valid, invalidObject, validator);
     });
   });
@@ -140,7 +140,7 @@ describe('Subscription: ', function() {
 
   validateIncorrectPermissions(
     "You do not have read permissions on this socket, and therefore cannot subscribe to channels.",
-    validators.subscribe.incorrectPermissions
+    validators.subscribe.incorrectPermissionsError
   );
 
 });
@@ -181,9 +181,23 @@ describe('Unsubscription: ', function() {
     ], validators.unsubscribe.success);
   });
 
+  describe('not found', function() {
+    genericValidationTest({
+      sequence: 12345,
+      code: 404,
+      message: 'Not Found',
+      details: "You are not subscribed to the specified channel."
+    }, [
+      {sequence: 'not an integer'},
+      {code: 303}, //not 404
+      {message: 'not "Not Found"'},
+      {details: 'incorrect details message'}
+    ], validators.unsubscribe.notFoundError);
+  });
+
   validateIncorrectPermissions(
     "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels.",
-    validators.unsubscribe.incorrectPermissions
+    validators.unsubscribe.incorrectPermissionsError
   );
 
 });
@@ -215,11 +229,26 @@ describe('Publish ', function() {
       {code: 300}, //not 404
       {message: 'not "Not Found"'},
       {details: 'incorerct details message'}
-    ], validators.publish.noSubscriptions);
+    ], validators.publish.noSubscriptionsError);
   });
 
   validateIncorrectPermissions(
     "You do not have write permissions on this socket, and therefore cannot publish to channels.",
-    validators.publish.incorrectPermissions
+    validators.publish.incorrectPermissionsError
   );
+});
+
+describe('Messages', function() {
+  genericValidationTest({
+    id: '1f854174-3e55-43fa-9d4a-a0af54c6fc49', //any uuid
+    recieved: '2016-12-05T11:02:25-07:00', //iso 8601 timestamp
+    channel: 'any string',
+    message: 'any string'
+  }, [
+    {id: 'not a uuid'},
+    {recieved: 'not a timestamp'},
+    {channel: 1}, //not a string
+    {message: 1} //not a string
+  ], validators.message);
+
 });
