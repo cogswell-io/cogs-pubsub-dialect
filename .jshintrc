@@ -1,0 +1,9 @@
+{
+  "esversion": 6,
+  "node": true,     // Assume node objects are available.
+  "expr": true,     // Allow test functions like "it"
+  "mocha": true,    // Assume test objects are available like "declare" and "it"
+  "browser":true,   // Assume the window obejct is available.
+  "sub": true,      // Don't warn when we use myObj["myvar"] notation.
+  "undef": true    // true: Require all non-global variables to be declared (prevents global leaks)
+}

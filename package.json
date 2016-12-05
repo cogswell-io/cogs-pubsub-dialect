@@ -1,0 +1,27 @@
+{
+  "name": "cogs-pubsub-dialect",
+  "version": "1.0.0",
+  "description": "A collection of Joi validators to validate cogswell.io Pub-Sub response/request objects.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cogswell-io/cogs-pubsub-dialect.git"
+  },
+  "author": "Aviata Inc.",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/cogswell-io/cogs-pubsub-dialect/issues"
+  },
+  "homepage": "https://github.com/cogswell-io/cogs-pubsub-dialect#readme",
+  "dependencies": {
+    "joi": "^10.0.4"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "lodash": "^4.17.2",
+    "mocha": "^3.2.0"
+  }
+}
