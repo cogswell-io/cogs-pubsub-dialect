@@ -61,7 +61,7 @@ Use the following validators to validate their respective objects
 
 ## Testing
 
-To run the unit test:
+To run the unit tests, run the following command
 
 ```bash
 npm test
