@@ -15,20 +15,20 @@ const exampleObject = {
 }
 
 //without callback
-const result = validators.validate(exampleObject, validators.publish.noSubscriptions);
+const result = validators.validate(exampleObject, validators.publish.noSubscriptionsError);
 result == {err: null, value: exampleObject}; //true
 
 //with callback
-const result = validators.validate(exampleObject, validators.publish.noSubscriptions, function(err, value) {
+const result = validators.validate(exampleObject, validators.publish.noSubscriptionsError, function(err, value) {
   err == null; //true
   value == exampleObject; //true 
 });
 
 //with Joi directly
-const result = Joi.validate(exampleObject, validators.publish.noSubscriptions);
+const result = Joi.validate(exampleObject, validators.publish.noSubscriptionsError);
 result == {err: null, value: exampleObject}; //true
 //or
-const result = Joi.validate(exampleObject, validators.publish.noSubscriptions, function(err, value) {
+const result = Joi.validate(exampleObject, validators.publish.noSubscriptionsError, function(err, value) {
   err == null; //true
   value == exampleObject; //true 
 });
