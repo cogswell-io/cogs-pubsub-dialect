@@ -20,17 +20,13 @@ result == {err: null, value: exampleObject}; //true
 //with callback
 const result = validators.validate(exampleObject, validators.publish.noSubscriptionsError, function(err, value) {
   err == null; //true
-  value == exampleObject; //true 
+  //value will not necessarily equal the original object, for example, if Joi validates a date,
+  //it will also parse it into a JS date object
 });
 
-//with Joi directly
+//the validate function is a direct alias to Joi's validate therefore you can do this (or the callback version):
 const result = Joi.validate(exampleObject, validators.publish.noSubscriptionsError);
 result == {err: null, value: exampleObject}; //true
-//or
-const result = Joi.validate(exampleObject, validators.publish.noSubscriptionsError, function(err, value) {
-  err == null; //true
-  value == exampleObject; //true 
-});
 ```
 
 ## Validators

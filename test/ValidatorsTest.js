@@ -252,3 +252,48 @@ describe('Messages', function() {
   ], validators.message);
 
 });
+
+describe('validate function', function() {
+
+  it('should pass a valid object', function() {
+    const exampleObject = {
+      sequence: 12345,
+      code: 404,
+      message: 'Not Found',
+      details: 'There are no subscribers to the specified channel, so the message could not be delivered.'
+    };
+
+    //without callback
+    const result = validators.validate(exampleObject, validators.publish.noSubscriptionsError);
+    expect(result.error).to.be.null;
+    expect(result.value).to.be.deep.equal(exampleObject);
+
+    //with callback
+    validators.validate(exampleObject, validators.publish.noSubscriptionsError, function(err, value) {
+      expect(err).to.be.null;
+      expect(value).to.be.deep.equal(exampleObject);
+    });
+
+  });
+
+  it('should fail an invalid object', function() {
+    const exampleObject = {
+      sequence: 'not an integer',
+      code: 100,
+      message: 'wrong',
+      details: 'wrong'
+    };
+
+    //without callback
+    const result = validators.validate(exampleObject, validators.publish.noSubscriptionsError);
+    expect(result.error).to.not.be.null;
+    expect(result.value).to.be.deep.equal(exampleObject);
+
+    //with callback
+    validators.validate(exampleObject, validators.publish.noSubscriptionsError, function(err, value) {
+      expect(err).to.not.be.null;
+      expect(value).to.be.deep.equal(exampleObject);
+    });
+
+  });
+});
