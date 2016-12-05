@@ -1,5 +1,4 @@
-# Cogswell Pub-Sub Dialect
-
+# Cogswell Pub-Sub Dialect 
 This package is a collection of JavaScript object validators to validate [cogswell](https://cogswell.io) pub-sub request/response objects. This package uses the Joi library for validation.
 
 ## Usage
@@ -38,20 +37,24 @@ const result = Joi.validate(exampleObject, validators.publish.noSubscriptionsErr
 
 Use the following validators to validate their respective objects
 
-- general
--- catchAllError
--- invalidFormatError
-- subscribe
--- directive
--- success
--- incorrectPermissionsError
-- unsubscribe
--- directive
--- success
--- incorrectPermissionsError
--- notFoundError
-- publish
--- directive
--- incorrectPermissionsError
--- noSubscriptionsError
-- message
+* general
+** catchAllError
+** invalidFormatError
+
+* subscribe
+** directive
+** success
+** incorrectPermissionsError
+
+* unsubscribe
+** directive
+** success
+** incorrectPermissionsError
+** notFoundError
+
+* publish
+** directive
+** incorrectPermissionsError
+** noSubscriptionsError
+
+* message
