@@ -58,3 +58,11 @@ Use the following validators to validate their respective objects
   * noSubscriptionsError
 
 * message
+
+## Testing
+
+To run the unit test:
+
+```bash
+npm test
+```
