@@ -38,23 +38,23 @@ const result = Joi.validate(exampleObject, validators.publish.noSubscriptionsErr
 Use the following validators to validate their respective objects
 
 * general
-** catchAllError
-** invalidFormatError
+  * catchAllError
+  * invalidFormatError
 
 * subscribe
-** directive
-** success
-** incorrectPermissionsError
+  * directive
+  * success
+  * incorrectPermissionsError
 
 * unsubscribe
-** directive
-** success
-** incorrectPermissionsError
-** notFoundError
+  * directive
+  * success
+  * incorrectPermissionsError
+  * notFoundError
 
 * publish
-** directive
-** incorrectPermissionsError
-** noSubscriptionsError
+  * directive
+  * incorrectPermissionsError
+  * noSubscriptionsError
 
 * message
