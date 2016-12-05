@@ -9,6 +9,7 @@ function changeValue(object, value, validator) {
 
   const result = Joi.validate(newObject, validator);
   expect(result.error).to.not.be.null;
+  expect(result.value).to.have.all.keys(Object.keys(newObject));
 }
 
 function tryMultipleInvalidValues(valid, invalidObjects, validator) {
@@ -22,6 +23,7 @@ function tryMultipleInvalidValues(valid, invalidObjects, validator) {
 function passWhenValid(object, validator) {
   const result = Joi.validate(object, validator);
   expect(result.error).to.be.null;
+  expect(result.value).to.have.all.keys(Object.keys(object));
 }
 
 function failWhenMissingAny(valid, validator) {
