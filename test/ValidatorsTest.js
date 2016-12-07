@@ -4,7 +4,7 @@ const validators = require('../index');
 const expect = require('chai').expect;
 const _ = require('lodash');
 
-function changeValue(object, value, validator) {
+function testWithInvalid(object, value, validator) {
   const newObject = Object.assign({}, object, value);
 
   const result = Joi.validate(newObject, validator);
@@ -12,10 +12,26 @@ function changeValue(object, value, validator) {
   expect(result.value).to.have.all.keys(Object.keys(newObject));
 }
 
+function testWithValid(object, value, validator) {
+  const newObject = Object.assign({}, object, value);
+
+  const result = Joi.validate(newObject, validator);
+  expect(result.error).to.be.null;
+  expect(result.value).to.have.all.keys(Object.keys(newObject));
+}
+
 function tryMultipleInvalidValues(valid, invalidObjects, validator) {
   _.each(invalidObjects, function(invalidObject) {
     it(`should fail when ${Object.keys(invalidObject)[0]} is '${invalidObject[Object.keys(invalidObject)[0]]}'`, function() {
-      changeValue(valid, invalidObject, validator);
+      testWithInvalid(valid, invalidObject, validator);
+    });
+  });
+}
+
+function tryMultipleValidValues(valid, validObjects, validator) {
+  _.each(validObjects, function(validObject) {
+    it(`should pass when ${Object.keys(validObject)[0]} is '${validObject[Object.keys(validObject)[0]]}'`, function() {
+      testWithValid(valid, validObject, validator);
     });
   });
 }
@@ -26,12 +42,6 @@ function passWhenValid(object, validator) {
   expect(result.value).to.have.all.keys(Object.keys(object));
 }
 
-function failWhenMissingAny(valid, validator) {
-  _.each(valid, function(value, key) {
-    changeValue(valid, {[key]: undefined}, validator);
-  });
-}
-
 function validateIncorrectPermissions(errorMessage, validator) {
   describe('incorrect permissions response', function() {
     genericValidationTest({
@@ -40,22 +50,21 @@ function validateIncorrectPermissions(errorMessage, validator) {
       message: 'Not Authorized',
       details: errorMessage
     }, [
+    ], [
       {sequence: 'not an integer'},
-      {code: 300}, //not 401
-      {message: 'Not "Not Authorized"'},
-      {details: 999} //not a a string
+      {code: 300}, // not 401
+      {message: ''}, // zero-length string
+      {details: 999} // not a a string
     ], validator);
   });
 }
 
-function genericValidationTest(valid, invalids, validator) {
+function genericValidationTest(valid, valids, invalids, validator) {
   it('should pass when valid', function() {
     passWhenValid(valid, validator);
   });
 
-  it('should fail when missing any value', function() {
-    failWhenMissingAny(valid, validator);
-  });
+  tryMultipleValidValues(valid, valids, validator);
 
   tryMultipleInvalidValues(valid, invalids, validator);
 }
@@ -70,16 +79,30 @@ describe('General Responses: ', function() {
       details: 'any string'
     };
 
+    const validValues = [
+    ];
+
     const invalidValues = [
-      {code: 300}, //not 500
-      {message: 'Not Internal Error'},
+      {code: undefined},
+      {code: null},
+      {code: 300},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {sequence: undefined},
+      {sequence: null},
       {sequence: 'not an integer'},
-      {details: 3} // not a string
+      {sequence: 1.5},
+
+      {details: 3}
     ];
 
     const validator = validators.general.catchAllError;
 
-    genericValidationTest(validResponse, invalidValues, validator);
+    genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
 
   describe('catch-all error response', function() {
@@ -91,35 +114,64 @@ describe('General Responses: ', function() {
       details: 'any string'
     };
 
+    const validValues = [
+    ];
+
     const invalidValues = [
-      {code: 300}, //not 500
-      {message: 'Not Invalid Format'},
+      {code: undefined},
+      {code: null},
+      {code: 300},
+
+      {message: null},
+      {message: undefined},
+      {message: true},
+      {message: ''},
+
+      {sequence: null},
+      {sequence: undefined},
       {sequence: 'not an integer'},
+      {sequence: 1.5}, // not an integer
+
       {details: 3} // not a string
     ];
 
     const validator = validators.general.invalidFormatError;
 
-    genericValidationTest(validResponse, invalidValues, validator);
+    genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
 });
 
 describe('Subscription: ', function() {
 
   describe('directive', function() {
-    genericValidationTest({ //the valid object
+    genericValidationTest({ // the valid object
       sequence: 12345,
       directive: "subscribe",
       channel: "channel name"
-    }, [ //the invalid permutations
+    }, [ // the valid permutations
+      {sequence: -1},
+      {sequence: 0},
+    ], [ // the invalid permutations
+      {sequence: undefined},
+      {sequence: null},
+      {sequence: 1.5},
       {sequence: "not an integer"},
+
+      {directive: undefined},
+      {directive: null},
+      {directive: true},
+      {directive: 3},
+      {directive: ""},
       {directive: "not 'subscribe'"},
-      {channel: 3} // not a string
+
+      {channel: undefined},
+      {channel: null},
+      {channel: 3},
+      {channel: ''}
     ], validators.subscribe.directive); //the validator
   });
 
   describe('success response', function() {
-
     genericValidationTest({
       sequence: 12345,
       code: 200,
@@ -129,14 +181,31 @@ describe('Subscription: ', function() {
         "a third string"
       ]
     }, [
+      {sequence: -1},
+      {sequence: 0},
+
+      {channels: []},
+      {channels: ['a']},
+      {channels: ['a', 'b']},
+      {channels: ['a', 'b', 'c']},
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"]} // 128
+    ], [
+      {sequence: undefined},
+      {sequence: null},
+      {sequence: 1.5},
       {sequence: "not an integer"},
-      {code: 100}, //not 200
+
+      {code: undefined},
+      {code: null},
+      {code: 100},
+
+      {channels: undefined},
+      {channels: null},
       {channels: "not an array"},
-      {channels: [ //non-string array
-        123,
-        1234,
-        true
-      ]}
+      {channels: ["a", "b", 1]},
+      {channels: [123, 1234, true]},
+      {channels: [""]}, // 0
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
     ], validators.subscribe.success);
   });
 
@@ -154,10 +223,29 @@ describe('Unsubscription: ', function() {
       sequence: 12345,
       directive: "unsubscribe",
       channel: "channel name"
-    }, [ //the invalid permutations
+    }, [
+      {sequence: -1},
+      {sequence: 0},
+
+      {channel: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"} // 128
+    ], [ //the invalid permutations
+      {sequence: undefined},
+      {sequence: null},
+      {sequence: 1.5},
       {sequence: "not an integer"},
+
+      {directive: undefined},
+      {directive: null},
+      {directive: true},
+      {directive: 3},
+      {directive: ""},
       {directive: "not 'unsubscribe'"},
-      {channel: 3} // not a string
+
+      {channel: undefined},
+      {channel: null},
+      {channel: 3},
+      {channel: ''}, // 0
+      {channel: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"} // 129
     ], validators.unsubscribe.directive); //the validator
   });
 
@@ -172,14 +260,31 @@ describe('Unsubscription: ', function() {
         "a third string"
       ]
     }, [
+      {sequence: -1},
+      {sequence: 0},
+
+      {channels: []},
+      {channels: ['a']},
+      {channels: ['a', 'b']},
+      {channels: ['a', 'b', 'c']},
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"]} // 128
+    ], [ //the invalid permutations
+      {sequence: undefined},
+      {sequence: null},
+      {sequence: 1.5},
       {sequence: "not an integer"},
-      {code: 100}, //not 200
+
+      {code: undefined},
+      {code: null},
+      {code: 100},
+
+      {channels: undefined},
+      {channels: null},
       {channels: "not an array"},
-      {channels: [ //non-string array
-        123,
-        1234,
-        true
-      ]}
+      {channels: ["a", "b", 1]},
+      {channels: [123, 1234, true]},
+      {channels: [""]}, // 0
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
     ], validators.unsubscribe.success);
   });
 
@@ -190,10 +295,29 @@ describe('Unsubscription: ', function() {
       message: 'Not Found',
       details: "You are not subscribed to the specified channel."
     }, [
+      {sequence: -1},
+      {sequence: 0},
+
+      {details: undefined},
+      {details: ''},
+      {details: 'any string'},
+    ], [ //the invalid permutations
+      {sequence: undefined},
+      {sequence: null},
       {sequence: 'not an integer'},
-      {code: 303}, //not 404
-      {message: 'not "Not Found"'},
-      {details: 'incorrect details message'}
+      {sequence: 1.5},
+
+      {code: undefined},
+      {code: null},
+      {code: 303},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {details: null},
+      {details: 3}
     ], validators.unsubscribe.notFoundError);
   });
 
@@ -213,10 +337,35 @@ describe('Publish ', function() {
       channel: 'any string',
       message: 'any string'
     }, [
-      {sequence: 'not an integer'},
-      {directive: 'not "publish"'},
-      {message: 2}, //not a string
-      {details: 2} //not a string
+      {sequence: -1},
+      {sequence: 0},
+
+      {channel: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}, // 128
+
+      {message: ""},
+      {message: "a"},
+      {message: "any message"}
+    ], [ //the invalid permutations
+      {sequence: undefined},
+      {sequence: null},
+      {sequence: 1.5},
+      {sequence: "not an integer"},
+
+      {directive: undefined},
+      {directive: null},
+      {directive: true},
+      {directive: 3},
+      {directive: ""},
+      {directive: "not 'publish'"},
+
+      {channel: undefined},
+      {channel: null},
+      {channel: 3},
+      {channel: ''},
+
+      {message: undefined},
+      {message: null},
+      {message: 3}
     ], validators.publish.directive);
   });
 
@@ -227,10 +376,29 @@ describe('Publish ', function() {
       message: 'Not Found',
       details: "There are no subscribers to the specified channel, so the message could not be delivered."
     }, [
+      {sequence: -1},
+      {sequence: 0},
+
+      {message: "any message"},
+
+      {details: ""},
+      {details: "any message"}
+    ], [ //the invalid permutations
+      {sequence: undefined},
+      {sequence: null},
       {sequence: 'not an integer'},
-      {code: 300}, //not 404
-      {message: 'not "Not Found"'},
-      {details: 'incorerct details message'}
+      {sequence: 1.5},
+
+      {code: undefined},
+      {code: null},
+      {code: 303},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {details: 3}
     ], validators.publish.noSubscriptionsError);
   });
 
@@ -243,14 +411,37 @@ describe('Publish ', function() {
 describe('Messages', function() {
   genericValidationTest({
     id: '1f854174-3e55-43fa-9d4a-a0af54c6fc49', //any uuid
-    recieved: '2016-12-05T11:02:25-07:00', //iso 8601 timestamp
+    received: '2016-12-05T11:02:25-07:00', //iso 8601 timestamp
     channel: 'any string',
     message: 'any string'
   }, [
+    {received: '2016-12-05T11:02:25Z'},
+
+    {channel: '0'},
+    {channel: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'}, // 128
+
+    {message: ''},
+    {message: 'a'},
+    {message: 'any value'}
+  ], [ //the invalid permutations
+    {id: undefined},
+    {id: null},
     {id: 'not a uuid'},
-    {recieved: 'not a timestamp'},
-    {channel: 1}, //not a string
-    {message: 1} //not a string
+
+    {received: undefined},
+    {received: null},
+    {received: 123456789},
+    {received: 'not a timestamp'},
+
+    {channel: undefined},
+    {channel: null},
+    {channel: 1},
+    {channel: ""}, // 0
+    {channel: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0'}, // 129
+
+    {message: 1},
+    {message: null},
+    {message: undefined}
   ], validators.message);
 
 });
