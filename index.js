@@ -1,100 +1,118 @@
 const Joi = require('joi');
 
+// Directive schemas
+const Sequence = Joi.number().integer().required();
+const Channel = Joi.string().min(1).max(128).required();
+const ChannelList = Joi.array().items(Joi.alternatives().when('length', {
+  is: 0,
+  otherwise: Channel
+})).required();
+function Directive(directive) {
+  return Joi.string().valid(directive).required();
+}
+
+// Response schemas
+const StatusMessage = Joi.string().min(1).required();
+const StatusDetails = Joi.string().allow('').optional();
+function StatusCode(code) {
+  return Joi.number().integer().valid(code).required();
+}
+
+// Message schemas
+const Message = Joi.string().allow('').required();
+const Timestamp = Joi.date().iso().required();
+const UUID = Joi.string().uuid().required();
+
 module.exports = {
   general: {
     catchAllError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(500).required(),
-      message: Joi.any().valid('Internal Error').required(),
-      details: Joi.string().required()
+      sequence: Sequence,
+      code: StatusCode(500),
+      message: StatusMessage,
+      details: StatusDetails
     },
     invalidFormatError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(400).required(),
-      message: Joi.any().valid('Invalid Format').required(),
-      details: Joi.string().required()
+      sequence: Sequence,
+      code: StatusCode(400),
+      message: StatusMessage,
+      details: StatusDetails
     }
   },
+
   subscribe: {
     directive: {
-      sequence: Joi.number().integer().required(),
-      directive: Joi.any().valid('subscribe').required(),
-      channel: Joi.string().required()
+      sequence: Sequence,
+      directive: Directive('subscribe'),
+      channel: Channel
     },
     success: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(200).required(),
-      channels: Joi.array().items(Joi.string()).required()
+      sequence: Sequence,
+      code: StatusCode(200),
+      channels: ChannelList
     },
     incorrectPermissionsError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(401).required(),
-      message: Joi.any().valid('Not Authorized').required(),
-      details: Joi.string().valid(
-        "You do not have read permissions on this socket, and therefore cannot subscribe to channels."
-      ).required()
+      sequence: Sequence,
+      code: StatusCode(401),
+      message: StatusMessage,
+      details: StatusDetails
     }
   },
+
   unsubscribe: {
     directive: {
-      sequence: Joi.number().integer().required(),
-      directive: Joi.any().valid('unsubscribe').required(),
-      channel: Joi.string().required()
+      sequence: Sequence,
+      directive: Directive('unsubscribe'),
+      channel: Channel
     },
     success: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(200).required(),
-      channels: Joi.array().items(Joi.string()).required()
+      sequence: Sequence,
+      code: StatusCode(200),
+      channels: ChannelList
     },
     incorrectPermissionsError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(401).required(),
-      message: Joi.any().valid('Not Authorized').required(),
-      details: Joi.string().valid(
-        "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels."
-      ).required()
+      sequence: Sequence,
+      code: StatusCode(401),
+      message: StatusMessage,
+      details: StatusDetails
     },
     notFoundError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(404).required(),
-      message: Joi.any().valid("Not Found").required(),
-      details: Joi.any().valid(
-        "You are not subscribed to the specified channel."
-      ).required()
+      sequence: Sequence,
+      code: StatusCode(404),
+      message: StatusMessage,
+      details: StatusDetails
     }
   },
+
   publish: {
     directive: {
-      sequence: Joi.number().integer().required(),
-      directive: Joi.any().valid('publish').required(),
-      channel: Joi.string().required(),
-      message: Joi.string().required()
+      sequence: Sequence,
+      directive: Directive('publish'),
+      channel: Channel,
+      message: Message
     },
     incorrectPermissionsError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(401).required(),
-      message: Joi.any().valid('Not Authorized').required(),
-      details: Joi.string().valid(
-        "You do not have write permissions on this socket, and therefore cannot publish to channels."
-      ).required()
+      sequence: Sequence,
+      code: StatusCode(401),
+      message: StatusMessage,
+      details: StatusDetails
     },
     noSubscriptionsError: {
-      sequence: Joi.number().integer().required(),
-      code: Joi.any().valid(404).required(),
-      message: Joi.any().valid('Not Found').required(),
-      details: Joi.any().valid(
-        "There are no subscribers to the specified channel, so the message could not be delivered."
-      ).required()
+      sequence: Sequence,
+      code: StatusCode(404),
+      message: StatusMessage,
+      details: StatusDetails
     }
   },
+
   message: {
-    id: Joi.string().guid().required(),
-    recieved: Joi.date().iso().required(),
-    channel: Joi.string().required(),
-    message: Joi.string().required()
+    id: UUID,
+    received: Timestamp,
+    channel: Channel,
+    message: Message
   },
+
   validate: function(object, validator, callback) {
-    if(typeof callback === 'function') {
+    if (typeof callback === 'function') {
       return Joi.validate(object, validator, callback);
     } else {
       return Joi.validate(object, validator);
