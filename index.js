@@ -137,6 +137,33 @@ let DialectModule = {
     })
   },
 
+  'unsubscribe-all': {
+    request: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all')
+    }),
+    200: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all'),
+      code: StatusCode(200),
+      channels: ChannelList
+    }),
+    401: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all'),
+      code: StatusCode(401),
+      message: StatusMessage,
+      details: StatusDetails
+    }),
+    404: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all'),
+      code: StatusCode(404),
+      message: StatusMessage,
+      details: StatusDetails
+    })
+  },
+
   pub: {
     request: Schema({
       seq: Sequence,
