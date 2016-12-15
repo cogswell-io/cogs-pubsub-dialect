@@ -61,6 +61,14 @@ function identifySchema(obj) {
   return undefined;
 }
 
+// Auto-Validate by the object
+function parse(object) {
+  const {err, value} = validate(object, identifySchema(object));
+
+  // No error means it validated
+  return _.isNil(err);
+}
+
 // The Joi validator function.
 function validate(object, validator, callback) {
   if (typeof callback === 'function') {
