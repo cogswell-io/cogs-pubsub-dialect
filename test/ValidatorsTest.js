@@ -1,8 +1,12 @@
 /*jshint: expr: true*/
-const Joi = require('joi');
-const dialect = require('../index');
+
 const expect = require('chai').expect;
+
 const _ = require('lodash');
+const Joi = require('joi');
+const uuid = require('uuid');
+
+const dialect = require('../index');
 
 function testWithInvalid(object, value, validator) {
   const newObject = Object.assign({}, object, value);
@@ -132,7 +136,7 @@ describe('General Responses: ', function() {
     genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
 
-  describe('catch-all error response', function() {
+  describe('invalid directive response', function() {
 
     const validResponse = {
       seq: 12345,
@@ -172,6 +176,64 @@ describe('General Responses: ', function() {
     genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
 });
+
+describe('Client UUID: ', function() {
+
+  describe('request', function() {
+    genericValidationTest({ // the valid object
+      seq: 12345,
+      action: "client-uuid"
+    }, [ // the valid permutations
+      {seq: -1},
+      {seq: 0},
+    ], [ // the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: undefined},
+      {action: null},
+      {action: true},
+      {action: 3},
+      {action: ""},
+      {action: "not 'client-uuid'"}
+    ], dialect['client-uuid'].request); //the validator
+  });
+
+  describe('success response', function() {
+    genericValidationTest({
+      seq: 12345,
+      action: 'client-uuid',
+      code: 200,
+      uuid: uuid.v1()
+    }, [
+      {seq: -1},
+      {seq: 0},
+    ], [
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: "not 'client-uuid'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 100},
+
+      {uuid: undefined},
+      {uuid: null},
+      {uuid: "string, but not a uuid"},
+      {uuid: 12345678}
+    ], dialect['client-uuid'][200]);
+  });
+
+});
+
 
 describe('Subscribe: ', function() {
 

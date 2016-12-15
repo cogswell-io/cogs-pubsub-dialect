@@ -88,6 +88,19 @@ let DialectModule = {
     })
   },
 
+  'client-uuid': {
+    request: Schema({
+      seq: Sequence,
+      action: Action('client-uuid')
+    }),
+    200: Schema({
+      seq: Sequence,
+      action: Action('client-uuid'),
+      code: StatusCode(200),
+      uuid: UUID
+    })
+  },
+
   subscribe: {
     request: Schema({
       seq: Sequence,

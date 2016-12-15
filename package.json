@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/cogswell-io/cogs-pubsub-dialect#readme",
   "dependencies": {
-    "joi": "^10.0.6"
+    "joi": "^10.0.6",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
