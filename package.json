@@ -1,6 +1,6 @@
 {
   "name": "cogs-pubsub-dialect",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "A collection of Joi validators to validate cogswell.io Pub-Sub response/request objects.",
   "main": "index.js",
   "scripts": {
