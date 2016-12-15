@@ -88,6 +88,19 @@ let DialectModule = {
     })
   },
 
+  'client-uuid': {
+    request: Schema({
+      seq: Sequence,
+      action: Action('client-uuid')
+    }),
+    200: Schema({
+      seq: Sequence,
+      action: Action('client-uuid'),
+      code: StatusCode(200),
+      uuid: UUID
+    })
+  },
+
   subscribe: {
     request: Schema({
       seq: Sequence,
@@ -131,6 +144,33 @@ let DialectModule = {
     404: Schema({
       seq: Sequence,
       action: Action('unsubscribe'),
+      code: StatusCode(404),
+      message: StatusMessage,
+      details: StatusDetails
+    })
+  },
+
+  'unsubscribe-all': {
+    request: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all')
+    }),
+    200: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all'),
+      code: StatusCode(200),
+      channels: ChannelList
+    }),
+    401: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all'),
+      code: StatusCode(401),
+      message: StatusMessage,
+      details: StatusDetails
+    }),
+    404: Schema({
+      seq: Sequence,
+      action: Action('unsubscribe-all'),
       code: StatusCode(404),
       message: StatusMessage,
       details: StatusDetails

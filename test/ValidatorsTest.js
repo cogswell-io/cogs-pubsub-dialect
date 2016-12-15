@@ -1,8 +1,12 @@
 /*jshint: expr: true*/
-const Joi = require('joi');
-const dialect = require('../index');
+
 const expect = require('chai').expect;
+
 const _ = require('lodash');
+const Joi = require('joi');
+const uuid = require('uuid');
+
+const dialect = require('../index');
 
 function testWithInvalid(object, value, validator) {
   const newObject = Object.assign({}, object, value);
@@ -132,7 +136,7 @@ describe('General Responses: ', function() {
     genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
 
-  describe('catch-all error response', function() {
+  describe('invalid directive response', function() {
 
     const validResponse = {
       seq: 12345,
@@ -172,6 +176,64 @@ describe('General Responses: ', function() {
     genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
 });
+
+describe('Client UUID: ', function() {
+
+  describe('request', function() {
+    genericValidationTest({ // the valid object
+      seq: 12345,
+      action: "client-uuid"
+    }, [ // the valid permutations
+      {seq: -1},
+      {seq: 0},
+    ], [ // the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: undefined},
+      {action: null},
+      {action: true},
+      {action: 3},
+      {action: ""},
+      {action: "not 'client-uuid'"}
+    ], dialect['client-uuid'].request); //the validator
+  });
+
+  describe('success response', function() {
+    genericValidationTest({
+      seq: 12345,
+      action: 'client-uuid',
+      code: 200,
+      uuid: uuid.v1()
+    }, [
+      {seq: -1},
+      {seq: 0},
+    ], [
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: "not 'client-uuid'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 100},
+
+      {uuid: undefined},
+      {uuid: null},
+      {uuid: "string, but not a uuid"},
+      {uuid: 12345678}
+    ], dialect['client-uuid'][200]);
+  });
+
+});
+
 
 describe('Subscribe: ', function() {
 
@@ -352,7 +414,7 @@ describe('Unsubscribe: ', function() {
       {seq: 'not an integer'},
       {seq: 1.5},
 
-      {action: "not 'subscribe'"},
+      {action: "not 'unsubscribe'"},
       {action: ''},
       {action: undefined},
       {action: null},
@@ -391,7 +453,7 @@ describe('Unsubscribe: ', function() {
       {seq: 'not an integer'},
       {seq: 1.5},
 
-      {action: "not 'subscribe'"},
+      {action: "not 'unsubscribe'"},
       {action: ''},
       {action: undefined},
       {action: null},
@@ -408,6 +470,160 @@ describe('Unsubscribe: ', function() {
       {details: null},
       {details: 3}
     ], dialect.unsubscribe[404]);
+  });
+
+  validateIncorrectPermissions(
+    "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels.",
+    'unsubscribe', dialect.unsubscribe[401]
+  );
+
+});
+
+describe('Unsubscribe-All: ', function() {
+
+  describe('request', function() {
+    genericValidationTest({ //the valid object
+      seq: 12345,
+      action: "unsubscribe-all"
+    }, [
+      {seq: -1},
+      {seq: 0},
+    ], [ //the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: undefined},
+      {action: null},
+      {action: true},
+      {action: 3},
+      {action: ""},
+      {action: "not 'unsubscribe-all'"}
+    ], dialect['unsubscribe-all'].request); //the validator
+  });
+
+  describe('successful unsubscribe response', function() {
+
+    genericValidationTest({
+      seq: 12345,
+      action: 'unsubscribe-all',
+      code: 200,
+      channels: [
+        "a string",
+        "another string",
+        "a third string"
+      ]
+    }, [
+      {seq: -1},
+      {seq: 0},
+
+      {channels: []},
+      {channels: ['a']},
+      {channels: ['a', 'b']},
+      {channels: ['a', 'b', 'c']},
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"]} // 128
+    ], [ //the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: "not 'unsubscribe-all'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 100},
+
+      {channels: undefined},
+      {channels: null},
+      {channels: "not an array"},
+      {channels: ["a", "b", 1]},
+      {channels: [123, 1234, true]},
+      {channels: [""]}, // 0
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
+    ], dialect['unsubscribe-all'][200]);
+  });
+
+  describe('not found', function() {
+    genericValidationTest({
+      seq: 12345,
+      action: 'unsubscribe-all',
+      code: 401,
+      message: 'Not Authorized',
+      details: "You do not have read permissions."
+    }, [
+      {seq: -1},
+      {seq: 0},
+
+      {details: undefined},
+      {details: ''},
+      {details: 'any string'},
+    ], [ //the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 'not an integer'},
+      {seq: 1.5},
+
+      {action: "not 'unsubscribe-all'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 303},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {details: null},
+      {details: 3}
+    ], dialect['unsubscribe-all'][401]);
+  });
+
+  describe('not found', function() {
+    genericValidationTest({
+      seq: 12345,
+      action: 'unsubscribe-all',
+      code: 404,
+      message: 'Not Found',
+      details: "You are not subscribed to the specified channel."
+    }, [
+      {seq: -1},
+      {seq: 0},
+
+      {details: undefined},
+      {details: ''},
+      {details: 'any string'},
+    ], [ //the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 'not an integer'},
+      {seq: 1.5},
+
+      {action: "not 'unsubscribe-all'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 303},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {details: null},
+      {details: 3}
+    ], dialect['unsubscribe-all'][404]);
   });
 
   validateIncorrectPermissions(
