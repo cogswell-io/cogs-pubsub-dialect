@@ -509,9 +509,20 @@ describe('Unsubscribe-All: ', function() {
       seq: 12345,
       action: 'unsubscribe-all',
       code: 200,
+      channels: [
+        "a string",
+        "another string",
+        "a third string"
+      ]
     }, [
       {seq: -1},
       {seq: 0},
+
+      {channels: []},
+      {channels: ['a']},
+      {channels: ['a', 'b']},
+      {channels: ['a', 'b', 'c']},
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"]} // 128
     ], [ //the invalid permutations
       {seq: undefined},
       {seq: null},
@@ -526,6 +537,14 @@ describe('Unsubscribe-All: ', function() {
       {code: undefined},
       {code: null},
       {code: 100},
+
+      {channels: undefined},
+      {channels: null},
+      {channels: "not an array"},
+      {channels: ["a", "b", 1]},
+      {channels: [123, 1234, true]},
+      {channels: [""]}, // 0
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
     ], dialect['unsubscribe-all'][200]);
   });
 
