@@ -503,26 +503,15 @@ describe('Unsubscribe-All: ', function() {
     ], dialect['unsubscribe-all'].request); //the validator
   });
 
-  describe('successful unsubscribe response', function() {
+  describe('successful unsubscribe-all response', function() {
 
     genericValidationTest({
       seq: 12345,
       action: 'unsubscribe-all',
       code: 200,
-      channels: [
-        "a string",
-        "another string",
-        "a third string"
-      ]
     }, [
       {seq: -1},
       {seq: 0},
-
-      {channels: []},
-      {channels: ['a']},
-      {channels: ['a', 'b']},
-      {channels: ['a', 'b', 'c']},
-      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"]} // 128
     ], [ //the invalid permutations
       {seq: undefined},
       {seq: null},
@@ -537,18 +526,10 @@ describe('Unsubscribe-All: ', function() {
       {code: undefined},
       {code: null},
       {code: 100},
-
-      {channels: undefined},
-      {channels: null},
-      {channels: "not an array"},
-      {channels: ["a", "b", 1]},
-      {channels: [123, 1234, true]},
-      {channels: [""]}, // 0
-      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
     ], dialect['unsubscribe-all'][200]);
   });
 
-  describe('not found', function() {
+  describe('not authorized', function() {
     genericValidationTest({
       seq: 12345,
       action: 'unsubscribe-all',
@@ -632,6 +613,122 @@ describe('Unsubscribe-All: ', function() {
   );
 
 });
+
+describe('Subscriptions: ', function() {
+
+  describe('request', function() {
+    genericValidationTest({ //the valid object
+      seq: 12345,
+      action: "subscriptions"
+    }, [
+      {seq: -1},
+      {seq: 0},
+    ], [ //the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {action: undefined},
+      {action: null},
+      {action: true},
+      {action: 3},
+      {action: ""},
+      {action: "not 'subscriptions'"}
+    ], dialect['subscriptions'].request); //the validator
+  });
+
+  describe('successful subscriptions response', function() {
+
+    genericValidationTest({
+      seq: 12345,
+      action: 'subscriptions',
+      code: 200,
+      channels: [
+        "a string",
+        "another string",
+        "a third string"
+      ]
+    }, [
+      {seq: -1},
+      {seq: 0},
+
+      {channels: []},
+      {channels: ['a']},
+      {channels: ['a', 'b']},
+      {channels: ['a', 'b', 'c']},
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"]} // 128
+    ], [ //the invalid permutations
+      {action: "not 'subscriptions'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {seq: undefined},
+      {seq: null},
+      {seq: 1.5},
+      {seq: "not an integer"},
+
+      {code: undefined},
+      {code: null},
+      {code: 100},
+
+      {channels: undefined},
+      {channels: null},
+      {channels: "not an array"},
+      {channels: ["a", "b", 1]},
+      {channels: [123, 1234, true]},
+      {channels: [""]}, // 0
+      {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
+    ], dialect['subscriptions'][200]);
+  });
+
+  describe('not authorized', function() {
+    genericValidationTest({
+      seq: 12345,
+      action: 'subscriptions',
+      code: 401,
+      message: 'Not Authorized',
+      details: "You do not have read permissions."
+    }, [
+      {seq: -1},
+      {seq: 0},
+
+      {details: undefined},
+      {details: ''},
+      {details: 'any string'},
+    ], [ //the invalid permutations
+      {seq: undefined},
+      {seq: null},
+      {seq: 'not an integer'},
+      {seq: 1.5},
+
+      {action: "not 'subscriptions'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 303},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {details: null},
+      {details: 3}
+    ], dialect['subscriptions'][401]);
+  });
+
+  validateIncorrectPermissions(
+    "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels.",
+    'unsubscribe', dialect.unsubscribe[401]
+  );
+
+});
+
 
 describe('Publish ', function() {
 

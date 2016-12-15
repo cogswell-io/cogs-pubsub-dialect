@@ -158,8 +158,7 @@ let DialectModule = {
     200: Schema({
       seq: Sequence,
       action: Action('unsubscribe-all'),
-      code: StatusCode(200),
-      channels: ChannelList
+      code: StatusCode(200)
     }),
     401: Schema({
       seq: Sequence,
@@ -172,6 +171,26 @@ let DialectModule = {
       seq: Sequence,
       action: Action('unsubscribe-all'),
       code: StatusCode(404),
+      message: StatusMessage,
+      details: StatusDetails
+    })
+  },
+
+  subscriptions: {
+    request: Schema({
+      seq: Sequence,
+      action: Action('subscriptions')
+    }),
+    200: Schema({
+      seq: Sequence,
+      action: Action('subscriptions'),
+      code: StatusCode(200),
+      channels: ChannelList
+    }),
+    401: Schema({
+      seq: Sequence,
+      action: Action('subscriptions'),
+      code: StatusCode(401),
       message: StatusMessage,
       details: StatusDetails
     })
