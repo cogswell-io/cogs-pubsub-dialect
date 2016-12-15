@@ -220,4 +220,7 @@ let DialectModule = {
   validate,
 };
 
-module.exports = DialectModule;
+module.exports = {
+  DialectModule,
+  parse
+}
