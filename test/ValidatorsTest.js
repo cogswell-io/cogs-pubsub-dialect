@@ -131,7 +131,7 @@ describe('General Responses: ', function() {
       {details: 3}
     ];
 
-    const validator = dialect.general[500];
+    const validator = dialect.dialect.general[500];
 
     genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
@@ -171,7 +171,7 @@ describe('General Responses: ', function() {
       {details: 3} // not a string
     ];
 
-    const validator = dialect.general[400];
+    const validator = dialect.dialect.general[400];
 
     genericValidationTest(validResponse, validValues, invalidValues, validator);
   });
@@ -198,7 +198,7 @@ describe('Client UUID: ', function() {
       {action: 3},
       {action: ""},
       {action: "not 'client-uuid'"}
-    ], dialect['client-uuid'].request); //the validator
+    ], dialect.dialect['client-uuid'].request); //the validator
   });
 
   describe('success response', function() {
@@ -229,7 +229,7 @@ describe('Client UUID: ', function() {
       {uuid: null},
       {uuid: "string, but not a uuid"},
       {uuid: 12345678}
-    ], dialect['client-uuid'][200]);
+    ], dialect.dialect['client-uuid'][200]);
   });
 
 });
@@ -262,7 +262,7 @@ describe('Subscribe: ', function() {
       {channel: null},
       {channel: 3},
       {channel: ''}
-    ], dialect.subscribe.request); //the validator
+    ], dialect.dialect.subscribe.request); //the validator
   });
 
   describe('success response', function() {
@@ -306,12 +306,12 @@ describe('Subscribe: ', function() {
       {channels: [123, 1234, true]},
       {channels: [""]}, // 0
       {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
-    ], dialect.subscribe[200]);
+    ], dialect.dialect.subscribe[200]);
   });
 
   validateIncorrectPermissions(
     "You do not have read permissions on this socket, and therefore cannot subscribe to channels.",
-    'subscribe', dialect.subscribe[401]
+    'subscribe', dialect.dialect.subscribe[401]
   );
 
 });
@@ -346,7 +346,7 @@ describe('Unsubscribe: ', function() {
       {channel: 3},
       {channel: ''}, // 0
       {channel: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"} // 129
-    ], dialect.unsubscribe.request); //the validator
+    ], dialect.dialect.unsubscribe.request); //the validator
   });
 
   describe('successful unsubscribe response', function() {
@@ -391,7 +391,7 @@ describe('Unsubscribe: ', function() {
       {channels: [123, 1234, true]},
       {channels: [""]}, // 0
       {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
-    ], dialect.unsubscribe[200]);
+    ], dialect.dialect.unsubscribe[200]);
   });
 
   describe('not found', function() {
@@ -430,7 +430,7 @@ describe('Unsubscribe: ', function() {
 
       {details: null},
       {details: 3}
-    ], dialect.unsubscribe[401]);
+    ], dialect.dialect.unsubscribe[401]);
   });
 
   describe('not found', function() {
@@ -469,12 +469,12 @@ describe('Unsubscribe: ', function() {
 
       {details: null},
       {details: 3}
-    ], dialect.unsubscribe[404]);
+    ], dialect.dialect.unsubscribe[404]);
   });
 
   validateIncorrectPermissions(
     "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels.",
-    'unsubscribe', dialect.unsubscribe[401]
+    'unsubscribe', dialect.dialect.unsubscribe[401]
   );
 
 });
@@ -500,7 +500,7 @@ describe('Unsubscribe-All: ', function() {
       {action: 3},
       {action: ""},
       {action: "not 'unsubscribe-all'"}
-    ], dialect['unsubscribe-all'].request); //the validator
+    ], dialect.dialect['unsubscribe-all'].request); //the validator
   });
 
   describe('successful unsubscribe-all response', function() {
@@ -545,7 +545,7 @@ describe('Unsubscribe-All: ', function() {
       {channels: [123, 1234, true]},
       {channels: [""]}, // 0
       {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
-    ], dialect['unsubscribe-all'][200]);
+    ], dialect.dialect['unsubscribe-all'][200]);
   });
 
   describe('not authorized', function() {
@@ -584,7 +584,7 @@ describe('Unsubscribe-All: ', function() {
 
       {details: null},
       {details: 3}
-    ], dialect['unsubscribe-all'][401]);
+    ], dialect.dialect['unsubscribe-all'][401]);
   });
 
   describe('not found', function() {
@@ -623,12 +623,12 @@ describe('Unsubscribe-All: ', function() {
 
       {details: null},
       {details: 3}
-    ], dialect['unsubscribe-all'][404]);
+    ], dialect.dialect['unsubscribe-all'][404]);
   });
 
   validateIncorrectPermissions(
     "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels.",
-    'unsubscribe', dialect.unsubscribe[401]
+    'unsubscribe', dialect.dialect.unsubscribe[401]
   );
 
 });
@@ -654,7 +654,7 @@ describe('Subscriptions: ', function() {
       {action: 3},
       {action: ""},
       {action: "not 'subscriptions'"}
-    ], dialect['subscriptions'].request); //the validator
+    ], dialect.dialect['subscriptions'].request); //the validator
   });
 
   describe('successful subscriptions response', function() {
@@ -699,7 +699,7 @@ describe('Subscriptions: ', function() {
       {channels: [123, 1234, true]},
       {channels: [""]}, // 0
       {channels: ["0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"]} // 129
-    ], dialect['subscriptions'][200]);
+    ], dialect.dialect['subscriptions'][200]);
   });
 
   describe('not authorized', function() {
@@ -738,12 +738,12 @@ describe('Subscriptions: ', function() {
 
       {details: null},
       {details: 3}
-    ], dialect['subscriptions'][401]);
+    ], dialect.dialect['subscriptions'][401]);
   });
 
   validateIncorrectPermissions(
     "You do not have read permissions on this socket, and therefore cannot subscribe/unsubscribe to/from channels.",
-    'unsubscribe', dialect.unsubscribe[401]
+    'unsubscribe', dialect.dialect.unsubscribe[401]
   );
 
 });
@@ -787,7 +787,7 @@ describe('Publish ', function() {
       {msg: undefined},
       {msg: null},
       {msg: 3}
-    ], dialect.pub.request);
+    ], dialect.dialect.pub.request);
   });
 
   describe('no subscriptions response', function() {
@@ -826,12 +826,12 @@ describe('Publish ', function() {
       {message: undefined},
 
       {details: 3}
-    ], dialect.pub[404]);
+    ], dialect.dialect.pub[404]);
   });
 
   validateIncorrectPermissions(
     "You do not have write permissions on this socket, and therefore cannot publish to channels.",
-    'pub', dialect.pub[401]
+    'pub', dialect.dialect.pub[401]
   );
 });
 
@@ -875,7 +875,7 @@ describe('Messages', function() {
     {msg: 1},
     {msg: null},
     {msg: undefined}
-  ], dialect.msg);
+  ], dialect.dialect.msg);
 
 });
 
@@ -891,12 +891,12 @@ describe('validate function', function() {
     };
 
     //without callback
-    const result = dialect.validate(exampleObject, dialect.pub[404]);
+    const result = dialect.validate(exampleObject, dialect.dialect.pub[404]);
     expect(result.error).to.be.null;
     expect(result.value).to.be.deep.equal(exampleObject);
 
     //with callback
-    dialect.validate(exampleObject, dialect.pub[404], function(err, value) {
+    dialect.validate(exampleObject, dialect.dialect.pub[404], function(err, value) {
       expect(err).to.be.null;
       expect(value).to.be.deep.equal(exampleObject);
     });
@@ -913,12 +913,12 @@ describe('validate function', function() {
     };
 
     //without callback
-    const result = dialect.validate(exampleObject, dialect.pub[404]);
+    const result = dialect.validate(exampleObject, dialect.dialect.pub[404]);
     expect(result.error).to.not.be.null;
     expect(result.value).to.be.deep.equal(exampleObject);
 
     //with callback
-    dialect.validate(exampleObject, dialect.pub[404], function(err, value) {
+    dialect.validate(exampleObject, dialect.dialect.pub[404], function(err, value) {
       expect(err).to.not.be.null;
       expect(value).to.be.deep.equal(exampleObject);
     });

@@ -38,7 +38,7 @@ function Schema(schemaObject) {
 // Identifies the schema to use in order to validate the supplied object.
 function identifySchema(obj) {
   if (obj) {
-    let category = DialectModule[obj.action];
+    let category = Dialect[obj.action];
     let code = obj.code;
 
     if (category) {
@@ -50,7 +50,7 @@ function identifySchema(obj) {
         return category.request;
       }
     } else if (code) {
-      let category = DialectModule.general;
+      let category = Dialect.general;
 
       if (category) {
         return category[code];
@@ -59,14 +59,6 @@ function identifySchema(obj) {
   }
 
   return undefined;
-}
-
-// Auto-Validate by the object
-function parse(object) {
-  const {err, value} = validate(object, identifySchema(object));
-
-  // No error means it validated
-  return _.isNil(err);
 }
 
 // The Joi validator function.
@@ -78,7 +70,28 @@ function validate(object, validator, callback) {
   }
 }
 
-let DialectModule = {
+// Validate the object, auto-detecting its schema.
+function autoValidate(object) {
+  const {error, value} = validate(object, identifySchema(object));
+
+  if (_.isNil(error)) {
+    return { isValid: true, value: value };
+  } else {
+    return { isValid: false, error: error };
+  }
+}
+
+// Parse and validate JSON, auto-detecting its schema.
+function parseAndAutoValidate(json) {
+  try {
+    const obj = JSON.parse(json);
+    return autoValidate(obj);
+  } catch (error) {
+    return { isValid: false, error: error };
+  }
+}
+
+let Dialect = {
   general: {
     500: Schema({
       seq: Sequence,
@@ -234,13 +247,14 @@ let DialectModule = {
     time: Timestamp,
     chan: Channel,
     msg: Message
-  }),
-
-  identifySchema,
-  validate,
+  })
 };
 
 module.exports = {
-  DialectModule,
-  parse
-}
+  autoValidate: autoValidate,
+  dialect: Dialect,
+  identifySchema: identifySchema,
+  parseAndAutoValidate: parseAndAutoValidate,
+  validate: validate
+};
+
