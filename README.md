@@ -1,6 +1,10 @@
 # Cogswell Pub-Sub Dialect 
 This package is a collection of JavaScript object validators to validate [cogswell](https://cogswell.io) pub-sub request/response objects. This package uses the Joi library for validation.
 
+## Pub/Sub JSON Dialect
+
+The dialect definition can be found at the [Pub/Sub Dialect](https://aviatainc.atlassian.net/wiki/pages/viewpage.action?pageId=61538367) page.
+
 ## Usage
 
 ```javascript
