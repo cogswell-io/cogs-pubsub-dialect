@@ -35,63 +35,7 @@ function Schema(schemaObject) {
   return Joi.object().keys(schemaObject);
 }
 
-// Identifies the schema to use in order to validate the supplied object.
-function identifySchema(obj) {
-  if (obj) {
-    let category = Dialect[obj.action];
-    let code = obj.code;
-
-    if (category) {
-      if (obj.action === 'msg') {
-        return category;
-      } else if (code) {
-        return category[code];
-      } else {
-        return category.request;
-      }
-    } else if (code) {
-      let category = Dialect.general;
-
-      if (category) {
-        return category[code];
-      }
-    }
-  }
-
-  return undefined;
-}
-
-// The Joi validator function.
-function validate(object, validator, callback) {
-  if (typeof callback === 'function') {
-    return Joi.validate(object, validator, callback);
-  } else {
-    return Joi.validate(object, validator);
-  }
-}
-
-// Validate the object, auto-detecting its schema.
-function autoValidate(object) {
-  const {error, value} = validate(object, identifySchema(object));
-
-  if (_.isNil(error)) {
-    return { isValid: true, value: value };
-  } else {
-    return { isValid: false, error: error };
-  }
-}
-
-// Parse and validate JSON, auto-detecting its schema.
-function parseAndAutoValidate(json) {
-  try {
-    const obj = JSON.parse(json);
-    return autoValidate(obj);
-  } catch (error) {
-    return { isValid: false, error: error };
-  }
-}
-
-let Dialect = {
+const Dialect = {
   general: {
     500: Schema({
       seq: Sequence,
@@ -249,6 +193,66 @@ let Dialect = {
     msg: Message
   })
 };
+
+// Identifies the schema to use in order to validate the supplied object.
+function identifySchema(obj) {
+  if (obj) {
+    let category = Dialect[obj.action];
+    let code = obj.code;
+
+    if (category) {
+      if (obj.action === 'msg') {
+        return category;
+      } else if (code) {
+        return category[code];
+      } else {
+        return category.request;
+      }
+    } else if (code) {
+      let category = Dialect.general;
+
+      if (category) {
+        return category[code];
+      }
+    }
+  }
+}
+
+// The Joi validator function.
+function validate(object, validator, callback) {
+  if (typeof callback === 'function') {
+    return Joi.validate(object, validator, callback);
+  } else {
+    return Joi.validate(object, validator);
+  }
+}
+
+// Validate the object, auto-detecting its schema.
+function autoValidate(object) {
+  const schema = identifySchema(object)
+
+  if (schema) {
+    const {error, value} = validate(object, schema);
+
+    if (error) {
+      return { isValid: false, error: error };
+    } else {
+      return { isValid: true, value: value };
+    }
+  } else {
+    return { isValid: false, error: new Error('No matching schema found.') };
+  }
+}
+
+// Parse and validate JSON, auto-detecting its schema.
+function parseAndAutoValidate(json) {
+  try {
+    const obj = JSON.parse(json);
+    return autoValidate(obj);
+  } catch (error) {
+    return { isValid: false, error: error };
+  }
+}
 
 module.exports = {
   autoValidate: autoValidate,

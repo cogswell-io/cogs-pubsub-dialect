@@ -95,6 +95,66 @@ function genericValidationTest(valid, valids, invalids, validator) {
   tryMultipleInvalidValues(valid, invalids, validator);
 }
 
+describe('Parse and Auto-validate', function() {
+  describe('should succeed with a valid record', function () {
+    const record = {
+      seq: 1,
+      action: 'pub',
+      chan: 'channel-a',
+      msg: 'message-a'
+    };
+    const validateResult = dialect.autoValidate(record);
+
+    expect(validateResult.isValid).to.equal(true);
+    expect(validateResult.error).to.be.undefined;
+    expect(validateResult.value).to.deep.equal(record);
+
+    const json = JSON.stringify(record);
+    const parseResult = dialect.parseAndAutoValidate(json);
+
+    expect(parseResult.isValid).to.equal(true);
+    expect(parseResult.error).to.be.undefined;
+    expect(parseResult.value).to.deep.equal(record);
+  });
+
+  describe('should fail as expected with identified, invalid record', function () {
+    const record = {
+      seq: 1,
+      action: 'pub',
+      chan: 5,
+      msg: 'message-a'
+    };
+    const validateResult = dialect.autoValidate(record);
+
+    expect(validateResult.isValid).to.equal(false);
+    expect(validateResult.value).to.be.undefined;
+    expect(validateResult.error).to.not.be.undefined;
+  });
+
+  describe('should fail as expected with an unidentified record', function () {
+    const record = {
+      seq: 1,
+      action: 'public',
+      chan: 'channel-a',
+      msg: 'message-a'
+    };
+    const validateResult = dialect.autoValidate(record);
+
+    expect(validateResult.isValid).to.equal(false);
+    expect(validateResult.value).to.be.undefined;
+    expect(validateResult.error).to.not.be.undefined;
+  });
+
+  describe('should fail as expected with invalid JSON', function () {
+    const json = "{this_be: invalid_json}";
+    const parseResult = dialect.parseAndAutoValidate(json);
+
+    expect(parseResult.isValid).to.equal(false);
+    expect(parseResult.value).to.be.undefined;
+    expect(parseResult.error).to.not.be.undefined;
+  });
+});
+
 describe('General Responses: ', function() {
 
   describe('catch-all error response', function() {
