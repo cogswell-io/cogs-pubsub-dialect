@@ -113,7 +113,6 @@ describe('Parse and Auto-validate', function() {
     const parseResult = dialect.parseAndAutoValidate(json);
 
     expect(parseResult.isValid).to.equal(true);
-    //expect(parseResult.error).to.not.be.ok;
     expect(parseResult.error).to.be.undefined;
     expect(parseResult.value).to.deep.equal(record);
   });
