@@ -96,7 +96,7 @@ function genericValidationTest(valid, valids, invalids, validator) {
 }
 
 describe('Parse and Auto-validate', function() {
-  describe('should succeed with a valid record', function () {
+  it('should succeed with a valid record', function () {
     const record = {
       seq: 1,
       action: 'pub',
@@ -113,11 +113,12 @@ describe('Parse and Auto-validate', function() {
     const parseResult = dialect.parseAndAutoValidate(json);
 
     expect(parseResult.isValid).to.equal(true);
+    //expect(parseResult.error).to.not.be.ok;
     expect(parseResult.error).to.be.undefined;
     expect(parseResult.value).to.deep.equal(record);
   });
 
-  describe('should fail as expected with identified, invalid record', function () {
+  it('should fail as expected with identified, invalid record', function () {
     const record = {
       seq: 1,
       action: 'pub',
@@ -131,7 +132,7 @@ describe('Parse and Auto-validate', function() {
     expect(validateResult.error).to.not.be.undefined;
   });
 
-  describe('should fail as expected with an unidentified record', function () {
+  it('should fail as expected with an unidentified record', function () {
     const record = {
       seq: 1,
       action: 'public',
@@ -145,7 +146,7 @@ describe('Parse and Auto-validate', function() {
     expect(validateResult.error).to.not.be.undefined;
   });
 
-  describe('should fail as expected with invalid JSON', function () {
+  it('should fail as expected with invalid JSON', function () {
     const json = "{this_be: invalid_json}";
     const parseResult = dialect.parseAndAutoValidate(json);
 
