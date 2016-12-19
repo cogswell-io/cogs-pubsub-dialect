@@ -229,18 +229,22 @@ function validate(object, validator, callback) {
 
 // Validate the object, auto-detecting its schema.
 function autoValidate(object) {
+  const seq = (object) ? object.seq : undefined;
+  const action = (object) ? object.action : undefined;
+
   const schema = identifySchema(object)
 
   if (schema) {
     const {error, value} = validate(object, schema);
 
     if (error) {
-      return { isValid: false, error: error };
+      return { isValid: false, seq, action, error };
     } else {
-      return { isValid: true, value: value };
+      return { isValid: true, seq, action, value };
     }
   } else {
-    return { isValid: false, error: new Error('No matching schema found.') };
+    return { isValid: false, seq, action,
+      error: new Error('No matching schema found.') };
   }
 }
 
