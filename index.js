@@ -204,19 +204,31 @@ const Dialect = {
 // Identifies the schema to use in order to validate the supplied object.
 function identifySchema(obj) {
   if (obj) {
-    const category = Dialect[obj.action];
     const code = obj.code;
     const action = obj.action;
+    const category = Dialect[action];
 
     if (category) {
       if (action === 'msg' || action == 'invalid-request') {
+        // First handle the schemas which are a category unto themselves.
         return category;
       } else if (code) {
-        return category[code];
+        // Then handle codes. Fall through if there is a code,
+        // but it doesn't exist for the identified category.
+        const categoryCode = category[code];
+
+        if (categoryCode) {
+          return categoryCode;
+        }
       } else {
+        // If there is no code, attempted to fetch the request sub-object.
         return category.request;
       }
-    } else if (code) {
+    }
+    
+    if (code) {
+      // If there is a code, but it wasn't associated with the identified
+      // category (if any), then attempt to locate it in the general responses.
       let category = Dialect.general;
 
       if (category) {

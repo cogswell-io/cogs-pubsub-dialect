@@ -40,6 +40,17 @@ function tryMultipleValidValues(valid, validObjects, validator) {
   });
 }
 
+function testParseAndAutoValidate(json) {
+    const parseResult = dialect.parseAndAutoValidate(json);
+
+    if (!parseResult.isValid) {
+      console.log('parse failed:', parseResult.error);
+    }
+
+    expect(parseResult.isValid).to.equal(true);
+    expect(parseResult.error).to.be.undefined;
+}
+
 function automaticSchemaIdentification(object) {
   it('should correctly identify schemas for valid records', function() {
     let schema = dialect.identifySchema(object);
@@ -1030,5 +1041,9 @@ describe('validate function', function() {
       expect(err).to.not.be.null;
       expect(value).to.be.deep.equal(exampleObject);
     });
+  });
+
+  it('should validate random valid fragments', function() {
+    testParseAndAutoValidate(`{"seq":0,"action":"pub","code":500,"message":"Internal Error","details":"Error ID: c8bc2110-c712-11e6-8e53-15e0972d5173"}`);
   });
 });
