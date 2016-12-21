@@ -185,6 +185,13 @@ const Dialect = {
     })
   },
 
+  'invalid-request': Schema({
+    action: Action('invalid-request'),
+    code: StatusCode(400),
+    message: StatusMessage,
+    details: StatusDetails
+  }),
+
   msg: Schema({
     id: UUID,
     action: Action('msg'),
@@ -197,11 +204,12 @@ const Dialect = {
 // Identifies the schema to use in order to validate the supplied object.
 function identifySchema(obj) {
   if (obj) {
-    let category = Dialect[obj.action];
-    let code = obj.code;
+    const category = Dialect[obj.action];
+    const code = obj.code;
+    const action = obj.action;
 
     if (category) {
-      if (obj.action === 'msg') {
+      if (action === 'msg' || action == 'invalid-request') {
         return category;
       } else if (code) {
         return category[code];

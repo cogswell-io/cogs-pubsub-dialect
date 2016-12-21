@@ -167,6 +167,7 @@ describe('General Responses: ', function() {
     };
 
     const validValues = [
+      {details: undefined}
     ];
 
     const invalidValues = [
@@ -207,6 +208,8 @@ describe('General Responses: ', function() {
     };
 
     const validValues = [
+      {details: undefined},
+      {details: ''},
     ];
 
     const invalidValues = [
@@ -228,6 +231,7 @@ describe('General Responses: ', function() {
       {seq: 'not an integer'},
       {seq: 1.5}, // not an integer
 
+      {details: null},
       {details: 3} // not a string
     ];
 
@@ -454,7 +458,7 @@ describe('Unsubscribe: ', function() {
     ], dialect.dialect.unsubscribe[200]);
   });
 
-  describe('not found', function() {
+  describe('not authorized', function() {
     genericValidationTest({
       seq: 12345,
       action: 'unsubscribe',
@@ -863,6 +867,7 @@ describe('Publish ', function() {
 
       {message: "any message"},
 
+      {details: undefined},
       {details: ""},
       {details: "any message"}
     ], [ //the invalid permutations
@@ -885,7 +890,8 @@ describe('Publish ', function() {
       {message: null},
       {message: undefined},
 
-      {details: 3}
+      {details: 3},
+      {details: null}
     ], dialect.dialect.pub[404]);
   });
 
@@ -893,6 +899,48 @@ describe('Publish ', function() {
     "You do not have write permissions on this socket, and therefore cannot publish to channels.",
     'pub', dialect.dialect.pub[401]
   );
+});
+
+describe('Invalid Request', function() {
+
+  describe('catch-all error response', function() {
+    const validResponse = {
+      code: 400,
+      action: 'invalid-request',
+      message: 'Internal Request Format',
+      details: 'any string'
+    };
+
+    const validValues = [
+      {message: 'anything'},
+
+      {details: undefined},
+      {details: ''}
+    ];
+
+    const invalidValues = [
+      {action: "not 'invalid-request'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {code: undefined},
+      {code: null},
+      {code: 300},
+
+      {message: ''},
+      {message: true},
+      {message: null},
+      {message: undefined},
+
+      {details: null},
+      {details: 3}
+    ];
+
+    const validator = dialect.dialect['invalid-request'];
+
+    genericValidationTest(validResponse, validValues, invalidValues, validator);
+  });
 });
 
 describe('Messages', function() {
