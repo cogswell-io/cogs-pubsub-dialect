@@ -919,14 +919,17 @@ describe('Invalid Request', function() {
       code: 400,
       action: 'invalid-request',
       message: 'Internal Request Format',
-      details: 'any string'
+      details: 'any string',
+      bad_request: '{}'
     };
 
     const validValues = [
       {message: 'anything'},
 
       {details: undefined},
-      {details: ''}
+      {details: ''},
+
+      {bad_request: ''}
     ];
 
     const invalidValues = [
@@ -945,7 +948,10 @@ describe('Invalid Request', function() {
       {message: undefined},
 
       {details: null},
-      {details: 3}
+      {details: 3},
+
+      {bad_request: undefined},
+      {bad_request: null}
     ];
 
     const validator = dialect.dialect['invalid-request'];

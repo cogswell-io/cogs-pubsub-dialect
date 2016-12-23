@@ -189,7 +189,8 @@ const Dialect = {
     action: Action('invalid-request'),
     code: StatusCode(400),
     message: StatusMessage,
-    details: StatusDetails
+    details: StatusDetails,
+    bad_request: Message
   }),
 
   msg: Schema({
