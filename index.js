@@ -53,14 +53,14 @@ const Dialect = {
     })
   },
 
-  'client-uuid': {
+  'session-uuid': {
     request: Schema({
       seq: Sequence,
-      action: Action('client-uuid')
+      action: Action('session-uuid')
     }),
     200: Schema({
       seq: Sequence,
-      action: Action('client-uuid'),
+      action: Action('session-uuid'),
       code: StatusCode(200),
       uuid: UUID
     })

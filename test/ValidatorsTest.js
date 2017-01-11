@@ -257,7 +257,7 @@ describe('Client UUID: ', function() {
   describe('request', function() {
     genericValidationTest({ // the valid object
       seq: 12345,
-      action: "client-uuid"
+      action: "session-uuid"
     }, [ // the valid permutations
       {seq: -1},
       {seq: 0},
@@ -272,14 +272,14 @@ describe('Client UUID: ', function() {
       {action: true},
       {action: 3},
       {action: ""},
-      {action: "not 'client-uuid'"}
-    ], dialect.dialect['client-uuid'].request); //the validator
+      {action: "not 'session-uuid'"}
+    ], dialect.dialect['session-uuid'].request); //the validator
   });
 
   describe('success response', function() {
     genericValidationTest({
       seq: 12345,
-      action: 'client-uuid',
+      action: 'session-uuid',
       code: 200,
       uuid: uuid.v1()
     }, [
@@ -291,7 +291,7 @@ describe('Client UUID: ', function() {
       {seq: 1.5},
       {seq: "not an integer"},
 
-      {action: "not 'client-uuid'"},
+      {action: "not 'session-uuid'"},
       {action: ''},
       {action: undefined},
       {action: null},
@@ -304,7 +304,7 @@ describe('Client UUID: ', function() {
       {uuid: null},
       {uuid: "string, but not a uuid"},
       {uuid: 12345678}
-    ], dialect.dialect['client-uuid'][200]);
+    ], dialect.dialect['session-uuid'][200]);
   });
 
 });
