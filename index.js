@@ -29,6 +29,7 @@ function StatusCode(code) {
 const Message = Joi.string().allow('').required();
 const Timestamp = Joi.date().iso().required();
 const UUID = Joi.string().uuid().required();
+const Ack = Joi.boolean().optional();
 
 // Schema generator function
 function Schema(schemaObject) {
@@ -167,7 +168,8 @@ const Dialect = {
       seq: Sequence,
       action: Action('pub'),
       chan: Channel,
-      msg: Message
+      msg: Message,
+      ack: Ack
     }),
     401: Schema({
       seq: Sequence,
