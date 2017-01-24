@@ -840,7 +840,9 @@ describe('Publish ', function() {
 
       {msg: ""},
       {msg: "a"},
-      {msg: "any message"}
+      {msg: "any message"},
+      {ack: true},
+      {ack: false}
     ], [ //the invalid permutations
       {seq: undefined},
       {seq: null},
@@ -861,7 +863,8 @@ describe('Publish ', function() {
 
       {msg: undefined},
       {msg: null},
-      {msg: 3}
+      {msg: 3},
+      {ack: "hello"}
     ], dialect.dialect.pub.request);
   });
 
