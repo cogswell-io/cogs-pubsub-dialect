@@ -885,14 +885,10 @@ describe('Publish ', function() {
       {seq: 0},
       {seq: 1}
     ], [ //the invalid permutations
-      {id: undefined},
-      {id: null},
-      {id: 'not a uuid'},
-
-      {action: "not 'pub'"},
-      {action: ''},
       {action: undefined},
       {action: null},
+      {action: ''},
+      {action: "not 'pub'"},
 
       {seq: undefined},
       {seq: null},
@@ -901,7 +897,12 @@ describe('Publish ', function() {
 
       {code: undefined},
       {code: null},
-      {code: 303}
+      {code: 303},
+
+      {id: undefined},
+      {id: null},
+      {id: 'not a uuid'}
+
     ], dialect.dialect.pub[200]);
   });
 

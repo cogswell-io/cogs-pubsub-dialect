@@ -173,9 +173,9 @@ const Dialect = {
     }),
     200: Schema({
       seq: Sequence,
-      id: UUID,
       action: Action('pub'),
-      code: StatusCode(200)
+      code: StatusCode(200),
+      id: UUID
     }),
     401: Schema({
       seq: Sequence,
