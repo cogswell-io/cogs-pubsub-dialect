@@ -54,14 +54,14 @@ const Dialect = {
     })
   },
 
-  'client-uuid': {
+  'session-uuid': {
     request: Schema({
       seq: Sequence,
-      action: Action('client-uuid')
+      action: Action('session-uuid')
     }),
     200: Schema({
       seq: Sequence,
-      action: Action('client-uuid'),
+      action: Action('session-uuid'),
       code: StatusCode(200),
       uuid: UUID
     })
@@ -191,7 +191,8 @@ const Dialect = {
     action: Action('invalid-request'),
     code: StatusCode(400),
     message: StatusMessage,
-    details: StatusDetails
+    details: StatusDetails,
+    bad_request: Message
   }),
 
   msg: Schema({

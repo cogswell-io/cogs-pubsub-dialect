@@ -257,7 +257,7 @@ describe('Client UUID: ', function() {
   describe('request', function() {
     genericValidationTest({ // the valid object
       seq: 12345,
-      action: "client-uuid"
+      action: "session-uuid"
     }, [ // the valid permutations
       {seq: -1},
       {seq: 0},
@@ -272,14 +272,14 @@ describe('Client UUID: ', function() {
       {action: true},
       {action: 3},
       {action: ""},
-      {action: "not 'client-uuid'"}
-    ], dialect.dialect['client-uuid'].request); //the validator
+      {action: "not 'session-uuid'"}
+    ], dialect.dialect['session-uuid'].request); //the validator
   });
 
   describe('success response', function() {
     genericValidationTest({
       seq: 12345,
-      action: 'client-uuid',
+      action: 'session-uuid',
       code: 200,
       uuid: uuid.v1()
     }, [
@@ -291,7 +291,7 @@ describe('Client UUID: ', function() {
       {seq: 1.5},
       {seq: "not an integer"},
 
-      {action: "not 'client-uuid'"},
+      {action: "not 'session-uuid'"},
       {action: ''},
       {action: undefined},
       {action: null},
@@ -304,7 +304,7 @@ describe('Client UUID: ', function() {
       {uuid: null},
       {uuid: "string, but not a uuid"},
       {uuid: 12345678}
-    ], dialect.dialect['client-uuid'][200]);
+    ], dialect.dialect['session-uuid'][200]);
   });
 
 });
@@ -831,7 +831,8 @@ describe('Publish ', function() {
       seq: 12345,
       action: 'pub',
       chan: 'any string',
-      msg: 'any string'
+      msg: 'any string',
+      ack: false
     }, [
       {seq: -1},
       {seq: 0},
@@ -841,8 +842,9 @@ describe('Publish ', function() {
       {msg: ""},
       {msg: "a"},
       {msg: "any message"},
-      {ack: true},
-      {ack: false}
+
+      {ack: undefined},
+      {ack: true}
     ], [ //the invalid permutations
       {seq: undefined},
       {seq: null},
@@ -864,6 +866,10 @@ describe('Publish ', function() {
       {msg: undefined},
       {msg: null},
       {msg: 3},
+
+      {ack: null},
+      {ack: 0},
+      {ack: 1},
       {ack: "hello"}
     ], dialect.dialect.pub.request);
   });
@@ -922,14 +928,17 @@ describe('Invalid Request', function() {
       code: 400,
       action: 'invalid-request',
       message: 'Internal Request Format',
-      details: 'any string'
+      details: 'any string',
+      bad_request: '{}'
     };
 
     const validValues = [
       {message: 'anything'},
 
       {details: undefined},
-      {details: ''}
+      {details: ''},
+
+      {bad_request: ''}
     ];
 
     const invalidValues = [
@@ -948,7 +957,10 @@ describe('Invalid Request', function() {
       {message: undefined},
 
       {details: null},
-      {details: 3}
+      {details: 3},
+
+      {bad_request: undefined},
+      {bad_request: null}
     ];
 
     const validator = dialect.dialect['invalid-request'];
