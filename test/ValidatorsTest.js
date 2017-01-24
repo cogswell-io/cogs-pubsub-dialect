@@ -831,7 +831,8 @@ describe('Publish ', function() {
       seq: 12345,
       action: 'pub',
       chan: 'any string',
-      msg: 'any string'
+      msg: 'any string',
+      ack: false
     }, [
       {seq: -1},
       {seq: 0},
@@ -841,8 +842,9 @@ describe('Publish ', function() {
       {msg: ""},
       {msg: "a"},
       {msg: "any message"},
-      {ack: true},
-      {ack: false}
+
+      {ack: undefined},
+      {ack: true}
     ], [ //the invalid permutations
       {seq: undefined},
       {seq: null},
@@ -864,6 +866,10 @@ describe('Publish ', function() {
       {msg: undefined},
       {msg: null},
       {msg: 3},
+
+      {ack: null},
+      {ack: 0},
+      {ack: 1},
       {ack: "hello"}
     ], dialect.dialect.pub.request);
   });
