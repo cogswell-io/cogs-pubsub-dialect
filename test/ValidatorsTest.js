@@ -878,12 +878,17 @@ describe('Publish ', function() {
     genericValidationTest({
       seq: 12345,
       action: 'pub',
-      code: 200
+      code: 200,
+      id: '1f854174-3e55-43fa-9d4a-a0af54c6fc49'
     }, [
       {seq: -1},
       {seq: 0},
       {seq: 1}
     ], [ //the invalid permutations
+      {id: undefined},
+      {id: null},
+      {id: 'not a uuid'},
+
       {action: "not 'pub'"},
       {action: ''},
       {action: undefined},

@@ -173,6 +173,7 @@ const Dialect = {
     }),
     200: Schema({
       seq: Sequence,
+      id: UUID,
       action: Action('pub'),
       code: StatusCode(200)
     }),
