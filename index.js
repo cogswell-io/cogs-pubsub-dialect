@@ -171,6 +171,11 @@ const Dialect = {
       msg: Message,
       ack: Ack
     }),
+    200: Schema({
+      seq: Sequence,
+      action: Action('pub'),
+      code: StatusCode(200)
+    }),
     401: Schema({
       seq: Sequence,
       action: Action('pub'),

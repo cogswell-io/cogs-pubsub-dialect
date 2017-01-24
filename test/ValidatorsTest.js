@@ -874,6 +874,32 @@ describe('Publish ', function() {
     ], dialect.dialect.pub.request);
   });
 
+  describe('publish ack response', function() {
+    genericValidationTest({
+      seq: 12345,
+      action: 'pub',
+      code: 200
+    }, [
+      {seq: -1},
+      {seq: 0},
+      {seq: 1}
+    ], [ //the invalid permutations
+      {action: "not 'pub'"},
+      {action: ''},
+      {action: undefined},
+      {action: null},
+
+      {seq: undefined},
+      {seq: null},
+      {seq: 'not an integer'},
+      {seq: 1.5},
+
+      {code: undefined},
+      {code: null},
+      {code: 303}
+    ], dialect.dialect.pub[200]);
+  });
+
   describe('no subscriptions response', function() {
     genericValidationTest({
       seq: 12345,
